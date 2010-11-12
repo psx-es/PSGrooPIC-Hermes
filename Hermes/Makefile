@@ -1,0 +1,48 @@
+R2PTARGET = utils/raw2payload
+CFLAGS = -Wall -O3
+
+CC = gcc
+PPU_CC = ppu-gcc
+PPU_OBJCOPY = ppu-objcopy
+REMOVE = rm -f
+REMOVEDIR = rm -rf
+
+OBJDIR = .
+
+PLOBJDIR = .
+
+PLSRC = hermes.S # jig_payload.S
+
+PLOBJ = $(PLSRC:%.S=$(PLOBJDIR)/%.o) 
+PLBIN = $(PLOBJ:%.o=$(PLOBJDIR)/%.bin)
+PLHEADER = $(PLBIN:%.bin=$(PLOBJDIR)/%.h)
+
+all: deps $(R2PTARGET) payloads
+
+deps:
+	@mkdir -p .depp
+
+#$(R2PTARGET): utils/raw2payload.c
+#	$(CC) $(CFLAGS) $< -o $@
+
+payloads : $(PLOBJ) $(PLBIN) $(PLHEADER)
+
+hermes.o: $(wildcard payload_*.S)
+
+%.o : %.S
+	$(PPU_CC) -c $< -o $@
+
+%.bin : %.o
+	$(PPU_OBJCOPY) -O binary $< $@
+
+%.h : %.bin
+	$(R2PTARGET).exe $< $@ $(*F)
+
+# Target: clean project.
+clean:
+	#$(REMOVE) $(R2PTARGET)
+	$(REMOVE) $(PLSRC:%.S=$(PLOBJDIR)/%.o)
+	$(REMOVE) $(PLOBJ:%.o=$(PLOBJDIR)/%.bin)
+	$(REMOVE) $(PLBIN:%.bin=$(PLOBJDIR)/%.h)
+
+.PHONY: all deps payloads clean
