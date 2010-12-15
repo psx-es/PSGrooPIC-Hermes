@@ -25,6 +25,11 @@
 #define default_payload_macro_1 default_payload_macro(PAYLOAD, FIRMWARE, 1)
 #define default_payload_macro_2 default_payload_macro(PAYLOAD, FIRMWARE, 2)
 #define default_payload_macro_3 default_payload_macro(PAYLOAD, FIRMWARE, 3)
+#define default_payload_macro_4 default_payload_macro(PAYLOAD, FIRMWARE, 4)
+
+#define PORT1_DESC_LEN		0x1000
+#define PORT1_DESC_LEN_HI	((PORT1_DESC_LEN >> 8) & 0xFF)
+#define PORT1_DESC_LEN_LO	(PORT1_DESC_LEN & 0xFF)
 
 const unsigned int8 USB_DEVICE_DESC[] = {
 	//HUB_DEVICE
@@ -49,9 +54,9 @@ const unsigned int8 USB_CONFIG_DESC[] = {
    //HUB_CONFIG
 		0x09,0x02,0x19,0x00,0x01,0x01,0x00,0xE0,0x32,0x09,0x04,0x00,0x00,0x01,0x09,0x00,0x00,0x00,0x07,0x05,0x81,0x03,0x01,0x00,0x0C,
    //PORT1_SHORT_CONFIG
-		0x09,0x02,0x00,0x0F,0x01,0x00,0x00,0x80,
+   		0x09,0x02,PORT1_DESC_LEN_LO,PORT1_DESC_LEN_HI,0x01,0x00,0x00,0x80,0xfa,
    //PORT1_CONFIG
-		default_payload_macro_1, default_payload_macro_2, default_payload_macro_3,
+		default_payload_macro_1, default_payload_macro_2, default_payload_macro_3, default_payload_macro_4,
 	//PORT2_CONFIG
 		0x09,0x02,0x16,0x00,0x01,0x01,0x00,0x80,0x01,0x09,0x04,0x00,0x00,0x00,0xFE,0x01,0x02,0x00,0x04,0x21,0xB4,0x2F,
 	//PORT3_CONFIG
@@ -381,7 +386,7 @@ const unsigned int8 jig_response[64] = {
 
 #define HUB_CONFIG_SIZE             0x0019
 #define PORT1_SHORT_CONFIG_SIZE     0x0008
-#define PORT1_CONFIG_SIZE           0x0F00
+#define PORT1_CONFIG_SIZE           0x1000
 #define PORT2_CONFIG_SIZE           0x0016
 #define PORT3_CONFIG_SIZE           0x0A4D
 #define PORT4_CONFIG_1_SIZE         0x0012
