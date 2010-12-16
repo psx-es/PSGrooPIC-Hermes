@@ -1,0 +1,7 @@
+*.hex
+*.exe
+*.zip
+*.err
+*.esym
+*.cod
+*.sym

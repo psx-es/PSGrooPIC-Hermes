@@ -26,6 +26,7 @@
 #define USB_EP2_RX_ENABLE  USB_ENABLE_INTERRUPT
 #define USB_EP2_RX_SIZE    8
 
+#include "led.h"
 #include "usb.h"
 #include "usb_desc.h"
 
@@ -64,9 +65,7 @@ unsigned int16 port_change[6] = { C_PORT_NONE, C_PORT_NONE, C_PORT_NONE, C_PORT_
 
 void Chirp() {
 	cnt = 2;
-	output_high(LEDR1);
-	output_high(LEDR2);
-	output_high(LEDR3);
+	initLED();
 }
 
 void Delay10ms(unsigned char delay) {
@@ -282,20 +281,9 @@ int16 GetHubLength() {
 
 void OnDongleOK() {
 	BlinkMode = 1;
-	output_high(LEDR1);
-	output_high(LEDR2);
-	output_high(LEDR3);
-	output_high(LEDG1);
-	output_high(LEDG2);
 }
 
 void main() {
-	output_high(LEDR1);
-	output_high(LEDR2);
-	output_high(LEDR3);
-	output_low(LEDG1);
-	output_low(LEDG2);
-   
 	usb_init();
    
 	setup_timer_0(RTCC_INTERNAL|RTCC_DIV_4);
@@ -303,6 +291,8 @@ void main() {
 
 	enable_interrupts(GLOBAL);
 	enable_interrupts(INT_TIMER0);
+
+	initLED();
 
 	while(1) {
 		usb_task();
@@ -399,9 +389,7 @@ void timer() {
 	//Blink
 	if(BlinkMode == 0) {
 		if(cnt == 20) {
-			output_toggle(LEDR1);
-			output_toggle(LEDR2);
-			output_toggle(LEDR3);
+			blink0LED();
 			cnt = 0;
 		}
 		else {
@@ -409,12 +397,14 @@ void timer() {
 		}
 	}
 
+	if(BlinkMode == 1) {
+		blink1LED();
+	}
+
 	//Chirp
 	if(BlinkMode == 2) {
 		if(!cnt) {
-			output_low(LEDR1);
-			output_low(LEDR2);
-			output_low(LEDR3);
+			blink2LED();
 		}
 		else {
 			cnt--;
